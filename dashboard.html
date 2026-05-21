@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Atlas Dashboard - Your Journey</title>
 
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 <style>
 * {
   margin: 0;
@@ -529,11 +532,7 @@ body {
         <button class="card-action" onclick="alert('Graph view coming soon! 📈')">View Full</button>
       </div>
       <div class="weight-graph">
-        <div class="empty-state">
-          <div class="empty-state-icon">🗺️</div>
-          <div class="empty-state-text">Your journey starts here</div>
-          <div class="empty-state-subtext">Log your first weight to see your map</div>
-        </div>
+        <canvas id="weightChart"></canvas>
       </div>
     </div>
     
@@ -618,6 +617,131 @@ let userData = {
   entries: []
 };
 
+let weightChart = null;
+
+// Initialize chart
+function initChart() {
+  const ctx = document.getElementById('weightChart').getContext('2d');
+  
+  weightChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Weight (lbs)',
+        data: [],
+        borderColor: '#00d4ff',
+        backgroundColor: 'rgba(0, 212, 255, 0.1)',
+        borderWidth: 3,
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: '#00d4ff',
+        pointBorderColor: '#0a1520',
+        pointBorderWidth: 2,
+        pointRadius: 6,
+        pointHoverRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          labels: {
+            color: '#e8f4f8',
+            font: {
+              size: 14,
+              weight: '600'
+            }
+          }
+        },
+        tooltip: {
+          backgroundColor: '#152838',
+          titleColor: '#00d4ff',
+          bodyColor: '#e8f4f8',
+          borderColor: '#00d4ff',
+          borderWidth: 1,
+          padding: 12,
+          displayColors: false,
+          callbacks: {
+            label: function(context) {
+              return context.parsed.y + ' lbs';
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          grid: {
+            color: 'rgba(0, 212, 255, 0.1)',
+            drawBorder: false
+          },
+          ticks: {
+            color: '#9bb4bd',
+            font: {
+              size: 12
+            },
+            callback: function(value) {
+              return value + ' lbs';
+            }
+          }
+        },
+        x: {
+          grid: {
+            color: 'rgba(0, 212, 255, 0.05)',
+            drawBorder: false
+          },
+          ticks: {
+            color: '#9bb4bd',
+            font: {
+              size: 12
+            },
+            maxRotation: 45,
+            minRotation: 0
+          }
+        }
+      }
+    }
+  });
+  
+  updateChart();
+}
+
+// Update chart with data
+function updateChart() {
+  if (!weightChart || userData.entries.length === 0) {
+    return;
+  }
+  
+  // Sort entries by date (oldest first for chart)
+  const sorted = [...userData.entries].sort((a, b) => new Date(a.date) - new Date(b.date));
+  
+  // Prepare data
+  const labels = sorted.map(entry => {
+    const date = new Date(entry.date);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  });
+  
+  const weights = sorted.map(entry => entry.weight);
+  
+  // Update chart
+  weightChart.data.labels = labels;
+  weightChart.data.datasets[0].data = weights;
+  
+  // Auto-scale Y axis with some padding
+  const minWeight = Math.min(...weights);
+  const maxWeight = Math.max(...weights);
+  const range = maxWeight - minWeight;
+  const padding = range > 0 ? range * 0.1 : 5;
+  
+  weightChart.options.scales.y.min = Math.floor(minWeight - padding);
+  weightChart.options.scales.y.max = Math.ceil(maxWeight + padding);
+  
+  weightChart.update();
+}
+
 // Load data from localStorage
 function loadData() {
   const saved = localStorage.getItem('atlasData');
@@ -693,6 +817,9 @@ function updateDashboard() {
   
   // Update entries list
   updateEntriesList();
+  
+  // Update chart
+  updateChart();
   
   // Check milestones
   checkMilestones();
@@ -823,6 +950,9 @@ function logout() {
 
 // Load data on page load
 loadData();
+
+// Initialize chart
+initChart();
 
 console.log('🌍 ATLAS Dashboard Loaded');
 console.log('💪 The weight you carry. The path you choose.');
