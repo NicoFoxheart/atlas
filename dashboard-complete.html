@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atlas - Your Journey</title>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<!-- Firebase SDK v9 (modular) -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, updateDoc, doc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+  import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDLv8Jf9_IVHnYo1H39YGnKXMcVfo4IFCc",
+    authDomain: "atlas-journey-e2d38.firebaseapp.com",
+    projectId: "atlas-journey-e2d38",
+    storageBucket: "atlas-journey-e2d38.firebasestorage.app",
+    messagingSenderId: "372235382990",
+    appId: "1:372235382990:web:1249066985c1258bdde09f",
+    measurementId: "G-7X1XRSZP1E"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+  
+  // Make available globally
+  window.firebaseAuth = auth;
+  window.firebaseDb = db;
+  window.firebaseStorage = storage;
+  window.GoogleAuthProvider = GoogleAuthProvider;
+  window.signInWithPopup = signInWithPopup;
+  window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+  window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+  window.onAuthStateChanged = onAuthStateChanged;
+  window.signOut = signOut;
+  window.collection = collection;
+  window.addDoc = addDoc;
+  window.getDocs = getDocs;
+  window.query = query;
+  window.where = where;
+  window.orderBy = orderBy;
+  window.updateDoc = updateDoc;
+  window.doc = doc;
+  window.ref = ref;
+  window.uploadBytes = uploadBytes;
+  window.getDownloadURL = getDownloadURL;
+  
+  console.log('🔥 Firebase initialized!');
+</script>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --ocean-deep: #0a4b5e;
+  --ocean-mid: #0d7d99;
+  --cyan-bright: #00d4ff;
+  --purple-deep: #2d1b4e;
+  --gold: #f4a261;
+  --text-light: #e8f4f8;
+  --text-dim: #9bb4bd;
+  --bg-dark: #0a1520;
+  --bg-card: #152838;
+  --success: #4ade80;
+  --warning: #fbbf24;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, var(--bg-dark) 0%, var(--ocean-deep) 100%);
+  color: var(--text-light);
+  min-height: 100vh;
+}
+
+/* Auth Screen */
+#authScreen {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.auth-container {
+  background: var(--bg-card);
+  padding: 48px;
+  border-radius: 16px;
+  max-width: 450px;
+  width: 100%;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.auth-logo {
+  font-size: 48px;
+  font-weight: 900;
+  text-align: center;
+  background: linear-gradient(135deg, var(--cyan-bright), var(--ocean-mid));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 12px;
+}
+
+.auth-tagline {
+  text-align: center;
+  color: var(--text-dim);
+  margin-bottom: 40px;
+  font-size: 14px;
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.auth-btn-google {
+  background: white;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.auth-btn-google:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+}
+
+.auth-divider {
+  text-align: center;
+  color: var(--text-dim);
+  margin: 24px 0;
+  font-size: 14px;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: var(--bg-dark);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 8px;
+  color: var(--text-light);
+  font-size: 16px;
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: var(--cyan-bright);
+}
+
+.auth-btn-email {
+  background: linear-gradient(135deg, var(--cyan-bright), var(--ocean-mid));
+  color: var(--bg-dark);
+}
+
+.auth-btn-email:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+.auth-switch a {
+  color: var(--cyan-bright);
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+/* Dashboard */
+#dashboardScreen {
+  display: none;
+}
+
+.header {
+  background: var(--bg-card);
+  border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 32px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--cyan-bright), var(--ocean-mid));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-name {
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+.logout-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 6px;
+  color: var(--cyan-bright);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.logout-btn:hover {
+  background: rgba(0, 212, 255, 0.1);
+}
+
+/* Container */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* Nav Tabs */
+.nav-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.nav-tab {
+  padding: 12px 24px;
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 212, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 600;
+}
+
+.nav-tab:hover {
+  border-color: rgba(0, 212, 255, 0.3);
+}
+
+.nav-tab.active {
+  background: linear-gradient(135deg, var(--cyan-bright), var(--ocean-mid));
+  color: var(--bg-dark);
+  border-color: transparent;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Quick Stats */
+.quick-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 212, 255, 0.1);
+  transition: all 0.3s;
+}
+
+.stat-card:hover {
+  border-color: rgba(0, 212, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--cyan-bright);
+}
+
+.stat-unit {
+  font-size: 18px;
+  color: var(--text-dim);
+  margin-left: 4px;
+}
+
+.stat-change {
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.stat-change.positive {
+  color: var(--success);
+}
+
+.stat-change.negative {
+  color: var(--warning);
+}
+
+/* Card */
+.card {
+  background: var(--bg-card);
+  padding: 32px;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 212, 255, 0.1);
+  margin-bottom: 24px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.card-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--cyan-bright);
+}
+
+.btn {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--cyan-bright), var(--ocean-mid));
+  color: var(--bg-dark);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+/* Weight Graph */
+.weight-graph {
+  height: 300px;
+}
+
+/* Input */
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  background: var(--bg-dark);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 8px;
+  color: var(--text-light);
+  font-size: 16px;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--cyan-bright);
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-dim);
+}
+
+@media (max-width: 768px) {
+  .auth-container {
+    padding: 32px 24px;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .nav-tabs {
+    overflow-x: auto;
+  }
+  
+  .quick-stats {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="authScreen">
+  <div class="auth-container">
+    <div class="auth-logo">ATLAS</div>
+    <div class="auth-tagline">The weight you carry. The path you choose.</div>
+    
+    <!-- Login Form -->
+    <div id="loginForm">
+      <button class="auth-btn auth-btn-google" onclick="signInWithGoogle()">
+        <span>🔵</span>
+        <span>Sign in with Google</span>
+      </button>
+      
+      <div class="auth-divider">──────── OR ────────</div>
+      
+      <input type="email" id="loginEmail" placeholder="Email" class="auth-input">
+      <input type="password" id="loginPassword" placeholder="Password" class="auth-input">
+      <button class="auth-btn auth-btn-email" onclick="emailLogin()">Sign In</button>
+      
+      <div class="auth-switch">
+        Don't have an account? <a onclick="showSignup()">Create one</a>
+      </div>
+    </div>
+    
+    <!-- Signup Form -->
+    <div id="signupForm" style="display: none;">
+      <button class="auth-btn auth-btn-google" onclick="signInWithGoogle()">
+        <span>🔵</span>
+        <span>Sign up with Google</span>
+      </button>
+      
+      <div class="auth-divider">──────── OR ────────</div>
+      
+      <input type="text" id="signupName" placeholder="Your Name" class="auth-input">
+      <input type="email" id="signupEmail" placeholder="Email" class="auth-input">
+      <input type="password" id="signupPassword" placeholder="Password (6+ characters)" class="auth-input">
+      <button class="auth-btn auth-btn-email" onclick="emailSignup()">Create Account</button>
+      
+      <div class="auth-switch">
+        Already have an account? <a onclick="showLogin()">Sign in</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD SCREEN -->
+<div id="dashboardScreen">
+  <div class="header">
+    <div class="logo">ATLAS</div>
+    <div class="user-info">
+      <span class="user-name">Welcome, <strong id="userName">Traveler</strong></span>
+      <button class="logout-btn" onclick="logoutUser()">Logout</button>
+    </div>
+  </div>
+  
+  <div class="container">
+    <!-- Nav Tabs -->
+    <div class="nav-tabs">
+      <div class="nav-tab active" onclick="switchTab('dashboard')">📊 Dashboard</div>
+      <div class="nav-tab" onclick="switchTab('weight')">⚖️ Weight</div>
+      <div class="nav-tab" onclick="switchTab('mood')">💙 Mood</div>
+      <div class="nav-tab" onclick="switchTab('medicine')">💊 Medicine</div>
+      <div class="nav-tab" onclick="switchTab('photos')">📸 Photos</div>
+      <div class="nav-tab" onclick="switchTab('goals')">🎯 Goals</div>
+    </div>
+    
+    <!-- Dashboard Tab -->
+    <div id="dashboard" class="tab-content active">
+      <div class="quick-stats">
+        <div class="stat-card">
+          <div class="stat-label">Current Weight</div>
+          <div>
+            <span class="stat-value" id="currentWeight">--</span>
+            <span class="stat-unit">lbs</span>
+          </div>
+          <div class="stat-change" id="weightChange">Start tracking</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-label">Goal Weight</div>
+          <div>
+            <span class="stat-value" id="goalWeight">--</span>
+            <span class="stat-unit">lbs</span>
+          </div>
+          <div class="stat-change" id="goalProgress">Set a goal</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-label">Days Tracked</div>
+          <div>
+            <span class="stat-value" id="daysTracked">0</span>
+            <span class="stat-unit">days</span>
+          </div>
+          <div class="stat-change">🔥 Keep going!</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-label">Total Progress</div>
+          <div>
+            <span class="stat-value" id="totalProgress">0</span>
+            <span class="stat-unit">lbs</span>
+          </div>
+          <div class="stat-change" id="progressText">Your path</div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Your Map 🗺️</h2>
+        </div>
+        <div class="weight-graph">
+          <canvas id="weightChart"></canvas>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Weight Tab -->
+    <div id="weight" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Log Weight ⚖️</h2>
+        </div>
+        <input type="number" id="weightInput" placeholder="Weight (lbs)" step="0.1">
+        <input type="date" id="dateInput">
+        <button class="btn" onclick="logWeight()">📊 Save Weight</button>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Recent Entries</h2>
+        </div>
+        <div id="weightEntries" class="loading">Loading...</div>
+      </div>
+    </div>
+    
+    <!-- Mood Tab -->
+    <div id="mood" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">How are you feeling? 💙</h2>
+        </div>
+        <select id="moodSelect">
+          <option value="">Select mood...</option>
+          <option value="great">😊 Great</option>
+          <option value="good">🙂 Good</option>
+          <option value="okay">😐 Okay</option>
+          <option value="low">😔 Low</option>
+          <option value="struggling">😭 Struggling</option>
+        </select>
+        <select id="energySelect">
+          <option value="">Energy level...</option>
+          <option value="high">⚡ High Energy</option>
+          <option value="medium">💫 Medium Energy</option>
+          <option value="low">😴 Low Energy</option>
+        </select>
+        <textarea id="moodNotes" placeholder="How are you really feeling? (optional)" rows="4"></textarea>
+        <button class="btn" onclick="logMood()">💙 Save Mood</button>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Recent Moods</h2>
+        </div>
+        <div id="moodEntries" class="loading">Loading...</div>
+      </div>
+    </div>
+    
+    <!-- Medicine Tab -->
+    <div id="medicine" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Track Medicine 💊</h2>
+        </div>
+        <input type="text" id="medicineInput" placeholder="Medicine name">
+        <input type="text" id="dosageInput" placeholder="Dosage (e.g., 10mg)">
+        <input type="time" id="timeInput">
+        <textarea id="medicineNotes" placeholder="Notes (optional)" rows="2"></textarea>
+        <button class="btn" onclick="logMedicine()">💊 Log Medicine</button>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Today's Medicine</h2>
+        </div>
+        <div id="medicineEntries" class="loading">Loading...</div>
+      </div>
+    </div>
+    
+    <!-- Photos Tab -->
+    <div id="photos" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Progress Photos 📸</h2>
+        </div>
+        <p style="color: var(--text-dim); margin-bottom: 16px;">Track your transformation visually</p>
+        <input type="file" id="photoInput" accept="image/*">
+        <input type="text" id="photoCaption" placeholder="Caption (optional)">
+        <button class="btn" onclick="uploadPhoto()">📸 Upload Photo</button>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Your Photos</h2>
+        </div>
+        <div id="photoGallery" class="loading">Loading...</div>
+      </div>
+    </div>
+    
+    <!-- Goals Tab -->
+    <div id="goals" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Set Your Goal 🎯</h2>
+        </div>
+        <input type="number" id="goalWeightInput" placeholder="Goal weight (lbs)" step="0.1">
+        <input type="date" id="goalDateInput" placeholder="Target date">
+        <textarea id="goalNotes" placeholder="Why this goal matters to you..." rows="4"></textarea>
+        <button class="btn" onclick="setGoal()">🎯 Save Goal</button>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Your Goal</h2>
+        </div>
+        <div id="goalDisplay" class="loading">Loading...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentUser = null;
+let weightChart = null;
+
+// Auth state listener
+setTimeout(() => {
+  if (window.onAuthStateChanged && window.firebaseAuth) {
+    window.onAuthStateChanged(window.firebaseAuth, (user) => {
+      if (user) {
+        currentUser = user;
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('dashboardScreen').style.display = 'block';
+        document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
+        initDashboard();
+      } else {
+        currentUser = null;
+        document.getElementById('authScreen').style.display = 'flex';
+        document.getElementById('dashboardScreen').style.display = 'none';
+      }
+    });
+  }
+}, 1000);
+
+// Auth functions
+function showSignup() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('signupForm').style.display = 'block';
+}
+
+function showLogin() {
+  document.getElementById('signupForm').style.display = 'none';
+  document.getElementById('loginForm').style.display = 'block';
+}
+
+async function signInWithGoogle() {
+  try {
+    const provider = new window.GoogleAuthProvider();
+    await window.signInWithPopup(window.firebaseAuth, provider);
+  } catch (error) {
+    alert('Error signing in: ' + error.message);
+  }
+}
+
+async function emailLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  
+  if (!email || !password) {
+    alert('Please fill in all fields');
+    return;
+  }
+  
+  try {
+    await window.signInWithEmailAndPassword(window.firebaseAuth, email, password);
+  } catch (error) {
+    alert('Error: ' + error.message);
+  }
+}
+
+async function emailSignup() {
+  const name = document.getElementById('signupName').value;
+  const email = document.getElementById('signupEmail').value;
+  const password = document.getElementById('signupPassword').value;
+  
+  if (!name || !email || !password) {
+    alert('Please fill in all fields');
+    return;
+  }
+  
+  if (password.length < 6) {
+    alert('Password must be at least 6 characters');
+    return;
+  }
+  
+  try {
+    await window.createUserWithEmailAndPassword(window.firebaseAuth, email, password);
+  } catch (error) {
+    alert('Error: ' + error.message);
+  }
+}
+
+async function logoutUser() {
+  if (confirm('Are you sure you want to logout?')) {
+    await window.signOut(window.firebaseAuth);
+  }
+}
+
+// Initialize dashboard
+function initDashboard() {
+  document.getElementById('dateInput').valueAsDate = new Date();
+  initChart();
+  loadDashboardData();
+}
+
+// Tab switching
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabName).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Chart initialization
+function initChart() {
+  const ctx = document.getElementById('weightChart');
+  if (!ctx) return;
+  
+  weightChart = new Chart(ctx.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Weight (lbs)',
+        data: [],
+        borderColor: '#00d4ff',
+        backgroundColor: 'rgba(0, 212, 255, 0.1)',
+        borderWidth: 3,
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: { color: '#e8f4f8' }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          ticks: { color: '#9bb4bd' },
+          grid: { color: 'rgba(0, 212, 255, 0.1)' }
+        },
+        x: {
+          ticks: { color: '#9bb4bd' },
+          grid: { color: 'rgba(0, 212, 255, 0.05)' }
+        }
+      }
+    }
+  });
+}
+
+// Load dashboard data
+async function loadDashboardData() {
+  if (!currentUser) return;
+  
+  // Load weight entries
+  const weightQuery = window.query(
+    window.collection(window.firebaseDb, 'weights'),
+    window.where('userId', '==', currentUser.uid),
+    window.orderBy('date', 'desc')
+  );
+  
+  const weightSnapshot = await window.getDocs(weightQuery);
+  const weights = [];
+  weightSnapshot.forEach(doc => weights.push({id: doc.id, ...doc.data()}));
+  
+  if (weights.length > 0) {
+    const current = weights[0].weight;
+    document.getElementById('currentWeight').textContent = current;
+    
+    // Update chart
+    const sorted = [...weights].reverse();
+    weightChart.data.labels = sorted.map(w => new Date(w.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'}));
+    weightChart.data.datasets[0].data = sorted.map(w => w.weight);
+    weightChart.update();
+  }
+  
+  document.getElementById('daysTracked').textContent = new Set(weights.map(w => w.date)).size;
+}
+
+// Log weight
+async function logWeight() {
+  const weight = parseFloat(document.getElementById('weightInput').value);
+  const date = document.getElementById('dateInput').value;
+  
+  if (!weight || !date) {
+    alert('Please enter both weight and date');
+    return;
+  }
+  
+  try {
+    await window.addDoc(window.collection(window.firebaseDb, 'weights'), {
+      userId: currentUser.uid,
+      weight: weight,
+      date: date,
+      timestamp: new Date().toISOString()
+    });
+    
+    alert('✅ Weight logged!');
+    document.getElementById('weightInput').value = '';
+    loadDashboardData();
+  } catch (error) {
+    alert('Error: ' + error.message);
+  }
+}
+
+// Log mood
+async function logMood() {
+  const mood = document.getElementById('moodSelect').value;
+  const energy = document.getElementById('energySelect').value;
+  const notes = document.getElementById('moodNotes').value;
+  
+  if (!mood) {
+    alert('Please select a mood');
+    return;
+  }
+  
+  try {
+    await window.addDoc(window.collection(window.firebaseDb, 'moods'), {
+      userId: currentUser.uid,
+      mood: mood,
+      energy: energy,
+      notes: notes,
+      date: new Date().toISOString().split('T')[0],
+      timestamp: new Date().toISOString()
+    });
+    
+    alert('💙 Mood logged!');
+    document.getElementById('moodSelect').value = '';
+    document.getElementById('energySelect').value = '';
+    document.getElementById('moodNotes').value = '';
+  } catch (error) {
+    alert('Error: ' + error.message);
+  }
+}
+
+// Log medicine
+async function logMedicine() {
+  const medicine = document.getElementById('medicineInput').value;
+  const dosage = document.getElementById('dosageInput').value;
+  const time = document.getElementById('timeInput').value;
+  const notes = document.getElementById('medicineNotes').value;
+  
+  if (!medicine) {
+    alert('Please enter medicine name');
+    return;
+  }
+  
+  try {
+    await window.addDoc(window.collection(window.firebaseDb, 'medicine'), {
+      userId: currentUser.uid,
+      medicine: medicine,
+      dosage: dosage,
+      time: time,
+      notes: notes,
+      date: new Date().toISOString().split('T')[0],
+      timestamp: new Date().toISOString()
+    });
+    
+    alert('💊 Medicine logged!');
+    document.getElementById('medicineInput').value = '';
+    document.getElementById('dosageInput').value = '';
+    document.getElementById('timeInput').value = '';
+    document.getElementById('medicineNotes').value = '';
+  } catch (error) {
+    alert('Error: ' + error.message);
+  }
+}
+
+// Upload photo
+async function uploadPhoto() {
+  const file = document.getElementById('photoInput').files[0];
+  const caption = document.getElementById('photoCaption').value;
+  
+  if (!file) {
+    alert('Please select a photo');
+    return;
+  }
+  
+  try {
+    const storageRef = window.ref(window.firebaseStorage, `photos/${currentUser.uid}/${Date.now()}_${file.name}`);
+    await window.uploadBytes(storageRef, file);
+    const url = await window.getDownloadURL(storageRef);
+    
+    await window.addDoc(window.collection(window.firebaseDb, 'photos'), {
+      userId: currentUser.uid,
+      url: url,
+      caption: caption,
+      date: new Date().toISOString().split('T')[0],
+      timestamp: new Date().toISOString()
+    });
+    
+    alert('📸 Photo uploaded!');
+    document.getElementById('photoInput').value = '';
+    document.getElementById('photoCaption').value = '';
+  } catch (error) {
+    alert('Error: ' + error.message);
+  }
+}
+
+// Set goal
+async function setGoal() {
+  const goalWeight = parseFloat(document.getElementById('goalWeightInput').value);
+  const goalDate = document.getElementById('goalDateInput').value;
+  const notes = document.getElementById('goalNotes').value;
+  
+  if (!goalWeight) {
+    alert('Please enter goal weight');
+    return;
+  }
+  
+  try {
+    await window.addDoc(window.collection(window.firebaseDb, 'goals'), {
+      userId: currentUser.uid,
+      goalWeight: goalWeight,
+      goalDate: goalDate,
+      notes: notes,
+      timestamp: new Date().toISOString()
+    });
+    
+    alert('🎯 Goal set!');
+    document.getElementById('goalWeightInput').value = '';
+    document.getElementById('goalDateInput').value = '';
+    document.getElementById('goalNotes').value = '';
+  } catch (error) {
+    alert('Error: ' + error.message);
+  }
+}
+
+console.log('🌍 ATLAS - Complete Version');
+console.log('💪 The weight you carry. The path you choose.');
+</script>
+
+</body>
+</html>
