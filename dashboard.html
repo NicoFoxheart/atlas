@@ -4,37 +4,94 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Atlas - The weight you carry. The path you choose. Track your transformation journey with honesty and purpose.">
-<title>Atlas - Your Transformation Journey</title>
+<title>Atlas - Your Journey</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --ocean-deep: #0a4b5e;
-  --ocean-mid: #0d7d99;
-  --cyan-bright: #00d4ff;
-  --purple-deep: #2d1b4e;
-  --purple-mid: #5a3d7a;
-  --gold: #f4a261;
-  --text-light: #e8f4f8;
-  --text-dim: #9bb4bd;
-  --bg-dark: #0a1520;
-  --bg-card: #152838;
+  --ocean-1: #001219;
+  --ocean-2: #005f73;
+  --ocean-3: #0a9396;
+  --cyan: #00d4ff;
+  --cyan-glow: rgba(0, 212, 255, 0.4);
+  --teal: #94d2bd;
+  --gold: #ee9b00;
+  --orange: #ca6702;
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: linear-gradient(135deg, var(--bg-dark) 0%, var(--ocean-deep) 100%);
-  color: var(--text-light);
+  font-family: 'Syne', sans-serif;
+  background: var(--ocean-1);
+  color: #fff;
   min-height: 100vh;
   overflow-x: hidden;
 }
 
-/* Hero Section */
+/* Ocean Background */
+.ocean-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.wave {
+  position: absolute;
+  width: 200%; height: 100%;
+  background: linear-gradient(180deg, transparent 0%, rgba(0,95,115,0.08) 30%, rgba(10,147,150,0.12) 50%, rgba(0,212,255,0.06) 70%, transparent 100%);
+  animation: wave 18s ease-in-out infinite;
+  opacity: 0.3;
+}
+.wave:nth-child(2) { animation: wave 24s ease-in-out infinite reverse; opacity: 0.15; animation-delay: -6s; }
+.wave:nth-child(3) { animation: wave 30s ease-in-out infinite; opacity: 0.1; animation-delay: -12s; }
+
+@keyframes wave {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  25% { transform: translateX(-5%) translateY(-2%); }
+  50% { transform: translateX(-10%) translateY(0); }
+  75% { transform: translateX(-5%) translateY(2%); }
+}
+
+/* Particles */
+.particle {
+  position: absolute;
+  width: 3px; height: 3px;
+  background: var(--cyan);
+  border-radius: 50%;
+  opacity: 0;
+  animation: floatUp 20s infinite;
+  box-shadow: 0 0 8px var(--cyan-glow);
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(100vh); opacity: 0; }
+  10% { opacity: 0.5; }
+  90% { opacity: 0.5; }
+  100% { transform: translateY(-100px); opacity: 0; }
+}
+
+/* Glass */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Main layout */
+#app { position: relative; z-index: 1; }
+
+/* ==================
+   HERO
+================== */
 .hero {
   min-height: 100vh;
   display: flex;
@@ -42,333 +99,744 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 40px 20px;
+  padding: 60px 24px 80px;
   position: relative;
 }
 
 .hero::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(ellipse at 50% 30%, rgba(0, 212, 255, 0.1) 0%, transparent 60%);
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at 50% 40%, rgba(0,212,255,0.08) 0%, transparent 65%);
   pointer-events: none;
 }
 
-.logo {
-  font-size: 72px;
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  border-radius: 50px;
+  background: rgba(0,212,255,0.08);
+  border: 1px solid rgba(0,212,255,0.2);
+  color: var(--cyan);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+  animation: fadeInDown 0.8s ease-out;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(80px, 15vw, 140px);
   font-weight: 900;
-  letter-spacing: -2px;
+  line-height: 0.9;
+  letter-spacing: -4px;
   margin-bottom: 24px;
-  background: linear-gradient(135deg, var(--cyan-bright), var(--ocean-mid));
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--teal) 50%, var(--gold) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: fadeInUp 0.8s ease-out 0.1s backwards;
   position: relative;
   z-index: 1;
 }
 
-.tagline {
-  font-size: 28px;
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-tagline {
+  font-size: clamp(20px, 4vw, 28px);
   font-weight: 300;
-  max-width: 600px;
+  color: rgba(255,255,255,0.7);
   line-height: 1.5;
-  margin-bottom: 48px;
-  color: var(--text-dim);
-  position: relative;
-  z-index: 1;
+  max-width: 560px;
+  margin-bottom: 16px;
+  animation: fadeInUp 0.8s ease-out 0.2s backwards;
 }
 
-.tagline strong {
-  color: var(--text-light);
-  font-weight: 500;
-}
-
-.cta-buttons {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 60px;
-  position: relative;
-  z-index: 1;
-}
-
-.btn {
-  padding: 16px 40px;
-  font-size: 18px;
+.hero-tagline strong {
+  color: #fff;
   font-weight: 600;
+}
+
+.hero-sub {
+  font-size: 15px;
+  color: var(--teal);
+  margin-bottom: 48px;
+  letter-spacing: 0.5px;
+  animation: fadeInUp 0.8s ease-out 0.3s backwards;
+}
+
+.cta-group {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: fadeInUp 0.8s ease-out 0.4s backwards;
+}
+
+.btn-cta {
+  padding: 18px 40px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Syne', sans-serif;
+  border-radius: 14px;
   border: none;
-  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s;
   text-decoration: none;
+  display: inline-block;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, var(--cyan-bright), var(--ocean-mid));
-  color: var(--bg-dark);
+.btn-cta-primary {
+  background: linear-gradient(135deg, var(--cyan), var(--ocean-3));
+  color: var(--ocean-1);
+  box-shadow: 0 8px 30px var(--cyan-glow);
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 212, 255, 0.4);
+.btn-cta-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px var(--cyan-glow);
 }
 
-.btn-secondary {
+.btn-cta-secondary {
   background: transparent;
-  border: 2px solid var(--cyan-bright);
-  color: var(--cyan-bright);
+  border: 2px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.7);
 }
 
-.btn-secondary:hover {
-  background: rgba(0, 212, 255, 0.1);
+.btn-cta-secondary:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  background: rgba(0,212,255,0.06);
 }
 
-/* Features Section */
-.features {
-  max-width: 1200px;
+/* Scroll indicator */
+.scroll-hint {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255,255,255,0.25);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: bob 2s ease-in-out infinite;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(6px); }
+}
+
+.scroll-hint span { font-size: 18px; }
+
+/* ==================
+   STATS STRIP
+================== */
+.stats-strip {
+  padding: 48px 24px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.stats-strip-inner {
+  max-width: 900px;
   margin: 0 auto;
-  padding: 80px 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  text-align: center;
+}
+
+.strip-stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px;
+  font-weight: 900;
+  color: var(--cyan);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.strip-stat-label {
+  font-size: 12px;
+  color: var(--teal);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+}
+
+/* ==================
+   FEATURES
+================== */
+.section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 100px 24px;
+}
+
+.section-eyebrow {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--cyan);
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 16px;
 }
 
 .section-title {
-  font-size: 48px;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 6vw, 56px);
   font-weight: 700;
   text-align: center;
   margin-bottom: 60px;
-  background: linear-gradient(135deg, var(--text-light), var(--cyan-bright));
+  color: #fff;
+  line-height: 1.1;
+  letter-spacing: -1px;
+}
+
+.section-title span {
+  background: linear-gradient(135deg, var(--cyan), var(--teal));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 32px;
-  margin-bottom: 80px;
+  gap: 20px;
 }
 
 .feature-card {
-  background: var(--bg-card);
   padding: 32px;
-  border-radius: 16px;
-  border: 1px solid rgba(0, 212, 255, 0.1);
-  transition: all 0.3s;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.02);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
 }
 
 .feature-card:hover {
-  border-color: rgba(0, 212, 255, 0.3);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 30px rgba(0, 212, 255, 0.2);
+  border-color: rgba(0,212,255,0.2);
+  background: rgba(0,212,255,0.04);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
 }
 
+.feature-card:hover::before { opacity: 1; }
+
 .feature-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
+  font-size: 44px;
+  margin-bottom: 18px;
+  display: block;
 }
 
 .feature-title {
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: var(--cyan-bright);
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 10px;
 }
 
-.feature-text {
-  color: var(--text-dim);
-  line-height: 1.6;
+.feature-desc {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.7;
 }
 
-/* Philosophy Section */
-.philosophy {
-  max-width: 800px;
+.feature-tag {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(0,212,255,0.08);
+  border: 1px solid rgba(0,212,255,0.15);
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ==================
+   PHILOSOPHY
+================== */
+.philosophy-section {
+  padding: 100px 24px;
+  background: rgba(0,95,115,0.04);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.philosophy-inner {
+  max-width: 720px;
   margin: 0 auto;
-  padding: 80px 20px;
   text-align: center;
 }
 
-.philosophy-text {
-  font-size: 20px;
-  line-height: 1.8;
-  color: var(--text-dim);
+.philosophy-quote {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+  margin-bottom: 40px;
+  letter-spacing: -0.5px;
+}
+
+.philosophy-quote em {
+  color: var(--cyan);
+  font-style: normal;
+}
+
+.philosophy-body {
+  font-size: 16px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.9;
   margin-bottom: 20px;
 }
 
-.philosophy-text strong {
-  color: var(--text-light);
+.philosophy-body strong { color: rgba(255,255,255,0.8); }
+
+/* ==================
+   WHAT'S NEW
+================== */
+.new-section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 100px 24px;
 }
 
-/* Footer */
-footer {
+.new-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 0;
+}
+
+.new-item {
+  padding: 24px 20px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
   text-align: center;
-  padding: 40px 20px;
-  color: var(--text-dim);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s;
 }
 
-footer a {
-  color: var(--cyan-bright);
+.new-item:hover {
+  background: rgba(0,212,255,0.05);
+  border-color: rgba(0,212,255,0.15);
+  transform: translateY(-4px);
+}
+
+.new-item-icon { font-size: 36px; margin-bottom: 12px; }
+.new-item-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.new-item-desc { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.5; }
+
+.new-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--gold), var(--orange));
+  color: var(--ocean-1);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+/* ==================
+   CTA SECTION
+================== */
+.cta-section {
+  padding: 100px 24px;
+  text-align: center;
+}
+
+.cta-inner {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 60px 40px;
+  border-radius: 28px;
+  background: linear-gradient(135deg, rgba(0,95,115,0.15), rgba(10,147,150,0.1));
+  border: 1px solid rgba(0,212,255,0.12);
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-inner::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,212,255,0.06), transparent);
+  animation: shimmer 4s infinite;
+}
+
+@keyframes shimmer { to { left: 100%; } }
+
+.cta-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 16px;
+  letter-spacing: -0.5px;
+}
+
+.cta-sub {
+  font-size: 16px;
+  color: var(--teal);
+  margin-bottom: 36px;
+  line-height: 1.6;
+}
+
+/* ==================
+   FOOTER
+================== */
+footer {
+  padding: 48px 24px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  text-align: center;
+}
+
+.footer-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--cyan), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: rgba(255,255,255,0.4);
   text-decoration: none;
+  font-size: 13px;
+  transition: color 0.3s;
 }
 
-footer a:hover {
-  text-decoration: underline;
+.footer-links a:hover { color: var(--cyan); }
+
+.footer-copy {
+  font-size: 12px;
+  color: rgba(255,255,255,0.2);
+  line-height: 1.8;
 }
 
 /* Mobile */
 @media (max-width: 768px) {
-  .logo {
-    font-size: 48px;
-  }
-  
-  .tagline {
-    font-size: 20px;
-  }
-  
-  .cta-buttons {
-    flex-direction: column;
-    width: 100%;
-    max-width: 300px;
-  }
-  
-  .section-title {
-    font-size: 32px;
-  }
-  
-  .features-grid {
-    grid-template-columns: 1fr;
-  }
+  .stats-strip-inner { grid-template-columns: repeat(2, 1fr); }
+  .features-grid { grid-template-columns: 1fr; }
+  .cta-inner { padding: 40px 24px; }
+  .new-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .new-grid { grid-template-columns: 1fr 1fr; }
+  .stats-strip-inner { grid-template-columns: repeat(2, 1fr); gap: 16px; }
 }
 </style>
 </head>
 <body>
 
-<!-- HERO SECTION -->
-<section class="hero">
-  <h1 class="logo">ATLAS</h1>
-  <p class="tagline">
-    <strong>The weight you carry.</strong><br>
-    <strong>The path you choose.</strong>
-  </p>
-  
-  <div class="cta-buttons">
-    <a href="dashboard.html" class="btn btn-primary">Start Your Journey</a>
-    <button class="btn btn-secondary" onclick="scrollToFeatures()">Learn More</button>
-  </div>
-  
-  <p style="color: var(--text-dim); font-size: 14px; margin-top: 20px;">
-    Your transformation. Your timeline. Your truth.
-  </p>
-</section>
+<!-- Background -->
+<div class="ocean-bg">
+  <div class="wave"></div>
+  <div class="wave"></div>
+  <div class="wave"></div>
+  <div id="particles"></div>
+</div>
 
-<!-- FEATURES SECTION -->
-<section class="features" id="features">
-  <h2 class="section-title">Map Your Transformation</h2>
-  
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">🗺️</div>
-      <h3 class="feature-title">The Map</h3>
-      <p class="feature-text">
-        Visualize your entire journey. Track weight, measurements, progress photos, and mood over time. See the real transformation—ups, downs, and everything between.
-      </p>
-    </div>
+<div id="app">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">✦ Your Journey Starts Here</div>
+    <h1 class="hero-logo">ATLAS</h1>
+    <p class="hero-tagline">
+      <strong>The weight you carry.</strong><br>
+      <strong>The path you choose.</strong>
+    </p>
+    <p class="hero-sub">Track your transformation with honesty, depth, and purpose.</p>
     
-    <div class="feature-card">
-      <div class="feature-icon">📱</div>
-      <h3 class="feature-title">Google Fit Sync</h3>
-      <p class="feature-text">
-        Connect your Google Fit account. Automatically sync weight, steps, activity, and sleep data. Your devices, your data, your dashboard.
-      </p>
+    <div class="cta-group">
+      <a href="index.html" class="btn-cta btn-cta-primary">Begin Your Journey</a>
+      <button class="btn-cta btn-cta-secondary" onclick="scrollTo('features')">Explore Atlas</button>
     </div>
-    
-    <div class="feature-card">
-      <div class="feature-icon">📝</div>
-      <h3 class="feature-title">Journey Log</h3>
-      <p class="feature-text">
-        Daily reflections, weekly goals, wins both scale and non-scale. Document the hard days honestly. This is your story, unfiltered.
-      </p>
+
+    <div class="scroll-hint">
+      <span>↓</span>
+      scroll
     </div>
-    
-    <div class="feature-card">
-      <div class="feature-icon">🏆</div>
-      <h3 class="feature-title">Real Milestones</h3>
-      <p class="feature-text">
-        Celebrate what actually matters. First 5 lbs. 30 days consistent. Your first progress photo. Custom milestones you define.
-      </p>
-    </div>
-    
-    <div class="feature-card">
-      <div class="feature-icon">💙</div>
-      <h3 class="feature-title">The Real Metrics</h3>
-      <p class="feature-text">
-        Not just weight. How do you feel? Energy levels? Sleep quality? Strength gains? Confidence? The numbers that actually matter.
-      </p>
-    </div>
-    
-    <div class="feature-card">
-      <div class="feature-icon">🌧️</div>
-      <h3 class="feature-title">Honest Tracker</h3>
-      <p class="feature-text">
-        Heavy days happen—mental or physical. Setbacks are part of the map. No shame, no hiding. Just honest tracking and real progress.
-      </p>
+  </section>
+
+  <!-- STATS STRIP -->
+  <div class="stats-strip">
+    <div class="stats-strip-inner">
+      <div>
+        <div class="strip-stat-num">7+</div>
+        <div class="strip-stat-label">Ways to Track</div>
+      </div>
+      <div>
+        <div class="strip-stat-num">💙</div>
+        <div class="strip-stat-label">Built with Care</div>
+      </div>
+      <div>
+        <div class="strip-stat-num">0</div>
+        <div class="strip-stat-label">Toxic Positivity</div>
+      </div>
+      <div>
+        <div class="strip-stat-num">∞</div>
+        <div class="strip-stat-label">Your Pace</div>
+      </div>
     </div>
   </div>
-</section>
 
-<!-- PHILOSOPHY SECTION -->
-<section class="philosophy">
-  <h2 class="section-title">Built Different</h2>
-  
-  <p class="philosophy-text">
-    <strong>This isn't another fitness app.</strong>
-  </p>
-  
-  <p class="philosophy-text">
-    No toxic positivity. No before/after shame. No crash diets or 30-day transformations. 
-  </p>
-  
-  <p class="philosophy-text">
-    Atlas is for the <strong>real journey</strong>. The multi-year grind. The days you show up even when you don't want to. The setbacks that teach you more than the wins.
-  </p>
-  
-  <p class="philosophy-text">
-    <strong>The weight you carry is yours.</strong><br>
-    Physical. Mental. Emotional.
-  </p>
-  
-  <p class="philosophy-text">
-    <strong>The path you choose is yours too.</strong><br>
-    Your pace. Your goals. Your definition of success.
-  </p>
-  
-  <p class="philosophy-text" style="margin-top: 40px; font-size: 24px; color: var(--cyan-bright);">
-    <strong>Map it honestly. Walk it proudly.</strong>
-  </p>
-</section>
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="section-eyebrow">Everything you need</div>
+    <h2 class="section-title">Map Your <span>Whole</span> Journey</h2>
+    
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">⚖️</span>
+        <div class="feature-title">Weight Tracking</div>
+        <div class="feature-desc">Log your weight daily. Watch the real trend over time, not just single numbers. The journey is the data.</div>
+        <div class="feature-tag">Core Feature</div>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">💧</span>
+        <div class="feature-title">Water Intake</div>
+        <div class="feature-desc">Eight glasses a day. Visual progress cups, daily reset, and streak tracking. Hydration is part of the journey.</div>
+        <div class="feature-tag">New</div>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">😴</span>
+        <div class="feature-title">Sleep Tracker</div>
+        <div class="feature-desc">Log bedtime and wake time. See your sleep hours and quality visualized. Rest is not optional — it's progress.</div>
+        <div class="feature-tag">New</div>
+      </div>
 
-<!-- FOOTER -->
-<footer>
-  <p><strong>ATLAS</strong> - Your Transformation Journey</p>
-  <p style="margin-top: 12px;">Created by Nicolas Graham</p>
-  <p style="margin-top: 12px; font-size: 14px;">Tampa, FL | © 2026</p>
-  <p style="margin-top: 20px;">
-    <a href="https://nicofoxheart.github.io/Nicolas-Graham-portfolio-" target="_blank">Portfolio</a> | 
-    <a href="https://instagram.com/nicofoxheart" target="_blank">@nicofoxheart</a>
-  </p>
-  <p style="margin-top: 30px; font-size: 12px; opacity: 0.6;">
-    Built for anyone carrying weight they can't see. 💙
-  </p>
-</footer>
+      <div class="feature-card">
+        <span class="feature-icon">🏃</span>
+        <div class="feature-title">Exercise Log</div>
+        <div class="feature-desc">Track every workout. Duration, type, calories. Build a record of every time you chose to move.</div>
+        <div class="feature-tag">Core Feature</div>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">📝</span>
+        <div class="feature-title">Daily Journal</div>
+        <div class="feature-desc">Write freely. Document the hard days and the wins. Your unfiltered story alongside your physical journey.</div>
+        <div class="feature-tag">New</div>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🥗</span>
+        <div class="feature-title">Nutrition Notes</div>
+        <div class="feature-desc">Not calorie counting. Just honest notes about what you ate and how it made you feel. Intuitive and real.</div>
+        <div class="feature-tag">New</div>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">💙</span>
+        <div class="feature-title">Mood Check-ins</div>
+        <div class="feature-desc">How are you really feeling? Energy, mood, notes. The inner journey tracked alongside the outer one.</div>
+        <div class="feature-tag">Core Feature</div>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">📸</span>
+        <div class="feature-title">Progress Photos</div>
+        <div class="feature-desc">Document your visual transformation. Tag each photo with your weight. See the real story the scale can't tell.</div>
+        <div class="feature-tag">New</div>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">📊</span>
+        <div class="feature-title">Weekly Summary</div>
+        <div class="feature-desc">Every week Atlas gives you a real recap. Weight change, workouts, sleep average. Honest data, no spin.</div>
+        <div class="feature-tag">New</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHILOSOPHY -->
+  <section class="philosophy-section">
+    <div class="philosophy-inner">
+      <h2 class="philosophy-quote">
+        "Not a fitness app.<br>
+        A <em>life</em> app."
+      </h2>
+      
+      <p class="philosophy-body">
+        No toxic positivity. No shame spirals. No 30-day miracle promises.
+      </p>
+      
+      <p class="philosophy-body">
+        Atlas is for the <strong>real journey</strong> — the multi-year grind, the heavy days, the quiet wins nobody celebrates, the setbacks that teach you more than the victories.
+      </p>
+      
+      <p class="philosophy-body">
+        <strong>The weight you carry is physical, mental, emotional.</strong><br>
+        All of it deserves to be tracked. All of it deserves to be honored.
+      </p>
+      
+      <p class="philosophy-body" style="font-size:20px; color:var(--cyan); margin-top:32px;">
+        <strong>Your pace. Your truth. Your map.</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- WHAT'S NEW -->
+  <section class="new-section">
+    <div class="section-eyebrow">Just added</div>
+    <h2 class="section-title" style="margin-bottom:40px">What's <span>New</span> in Atlas</h2>
+    
+    <div class="new-grid">
+      <div class="new-item">
+        <div class="new-badge">New</div>
+        <div class="new-item-icon">💧</div>
+        <div class="new-item-title">Water Tracker</div>
+        <div class="new-item-desc">Daily glass goal with visual cups</div>
+      </div>
+      <div class="new-item">
+        <div class="new-badge">New</div>
+        <div class="new-item-icon">😴</div>
+        <div class="new-item-title">Sleep Tracker</div>
+        <div class="new-item-desc">Hours, quality, sleep circle visual</div>
+      </div>
+      <div class="new-item">
+        <div class="new-badge">New</div>
+        <div class="new-item-icon">📝</div>
+        <div class="new-item-title">Daily Journal</div>
+        <div class="new-item-desc">Write your real story daily</div>
+      </div>
+      <div class="new-item">
+        <div class="new-badge">New</div>
+        <div class="new-item-icon">🥗</div>
+        <div class="new-item-title">Nutrition Notes</div>
+        <div class="new-item-desc">Log meals and how they feel</div>
+      </div>
+      <div class="new-item">
+        <div class="new-badge">New</div>
+        <div class="new-item-icon">📸</div>
+        <div class="new-item-title">Progress Photos</div>
+        <div class="new-item-desc">Visual journey documentation</div>
+      </div>
+      <div class="new-item">
+        <div class="new-badge">New</div>
+        <div class="new-item-icon">📊</div>
+        <div class="new-item-title">Weekly Summary</div>
+        <div class="new-item-desc">Real weekly recaps with trends</div>
+      </div>
+      <div class="new-item">
+        <div class="new-badge">New</div>
+        <div class="new-item-icon">🌙</div>
+        <div class="new-item-title">Dark/Light Mode</div>
+        <div class="new-item-desc">Toggle between themes</div>
+      </div>
+      <div class="new-item">
+        <div class="new-badge">New</div>
+        <div class="new-item-icon">📱</div>
+        <div class="new-item-title">Bottom Navigation</div>
+        <div class="new-item-desc">Mobile-first tab design</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-inner">
+      <h2 class="cta-title">Ready to start mapping?</h2>
+      <p class="cta-sub">Your journey is already happening.<br>Atlas just helps you see it clearly.</p>
+      <a href="index.html" class="btn-cta btn-cta-primary">Open Atlas →</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">ATLAS</div>
+    <div class="footer-links">
+      <a href="index.html">Dashboard</a>
+      <a href="https://nicofoxheart.github.io/Nicolas-Graham-portfolio-" target="_blank">Portfolio</a>
+      <a href="https://instagram.com/nicofoxheart" target="_blank">@nicofoxheart</a>
+    </div>
+    <div class="footer-copy">
+      Created by Nicolas Graham · Tampa, FL · © 2026<br>
+      <span style="margin-top:6px;display:block">Built for anyone carrying weight they can't see. 💙</span>
+    </div>
+  </footer>
+
+</div>
 
 <script>
-function scrollToFeatures() {
-  document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
+// Particles
+const container = document.getElementById('particles');
+for (let i = 0; i < 25; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.left = Math.random() * 100 + '%';
+  p.style.animationDelay = Math.random() * 20 + 's';
+  p.style.animationDuration = (15 + Math.random() * 10) + 's';
+  container.appendChild(p);
 }
 
-console.log('🌍 ATLAS - The weight you carry. The path you choose.');
-console.log('💪 Built by Nicolas Graham');
-</script>
+function scrollTo(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+}
 
+// Animate stats on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.style.opacity = '1';
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.feature-card, .new-item').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transition = 'opacity 0.5s ease, transform 0.4s ease';
+  observer.observe(el);
+});
+</script>
 </body>
 </html>
